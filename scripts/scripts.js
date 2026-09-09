@@ -21,6 +21,19 @@ import {
   IS_UE,
   IS_DA,
 } from './commerce.js';
+import {
+  runExperimentation,
+  runExperimentationLazy,
+} from './experiment-loader.js';
+
+const experimentationConfig = {
+  prodHost: 'main--lab-store--keoko.aem.live',
+  audiences: {
+    mobile: () => window.innerWidth < 600,
+    desktop: () => window.innerWidth >= 600,
+    // define your custom audiences here as needed
+  },
+};
 
 /*
  * Trusted Types default policy.
@@ -201,6 +214,8 @@ async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
 
+  await runExperimentation(doc, experimentationConfig);
+
   const main = doc.querySelector('main');
   if (main) {
     try {
@@ -246,6 +261,8 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+
+  await runExperimentationLazy(doc, experimentationConfig);
 }
 
 /**

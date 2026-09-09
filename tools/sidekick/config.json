@@ -1,0 +1,18 @@
+{
+  "plugins": [
+    {
+      "id": "aem-experimentation",
+      "titleI18n": {
+        "en": "Experimentation"
+      },
+      "environments": [
+        "dev",
+        "preview"
+      ],
+      "includePaths": [
+        "**.docx**"
+      ],
+      "event": "aem-experimentation-sidekick"
+    }
+  ]
+}
