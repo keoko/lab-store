@@ -21,6 +21,17 @@ import {
   IS_UE,
   IS_DA,
 } from './commerce.js';
+import {
+  runExperimentation,
+  runExperimentationLazy,
+} from './experiment-loader.js';
+
+const experimentationConfig = {
+  prodHost: 'main--lab-store--keoko.aem.live', // add your prodHost here, otherwise we will show mock data
+  audiences: {
+    // define your custom audiences here as needed
+  },
+};
 
 /*
  * Trusted Types default policy.
@@ -201,6 +212,8 @@ async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
 
+  await runExperimentation(doc, experimentationConfig);
+
   const main = doc.querySelector('main');
   if (main) {
     try {
@@ -231,6 +244,8 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  await runExperimentationLazy(doc, experimentationConfig);
+
   loadHeader(doc.querySelector('header'));
 
   const main = doc.querySelector('main');
