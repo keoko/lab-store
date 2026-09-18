@@ -336,6 +336,32 @@ export async function initializeCommerce() {
 }
 
 /**
+ * Fetches the order approval threshold (Extend Business Logic `order_approval_threshold`
+ * business-config value) from the mesh.
+ * @returns {Promise<number|null>} The threshold amount, or null if the mesh query
+ * fails or returns no value.
+ */
+export async function fetchOrderApprovalThreshold() {
+  try {
+    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(`
+      query ORDER_APPROVAL_THRESHOLD {
+        orderApprovalThreshold
+      }
+    `);
+
+    if (errors?.length) {
+      console.warn('Failed to fetch orderApprovalThreshold from mesh:', errors);
+      return null;
+    }
+
+    return data?.orderApprovalThreshold ?? null;
+  } catch (error) {
+    console.warn('Failed to fetch orderApprovalThreshold from mesh:', error);
+    return null;
+  }
+}
+
+/**
  * Decorates links.
  * @param {string} [link] url to be localized
  * @returns {string} - The localized link

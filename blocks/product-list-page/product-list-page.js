@@ -29,6 +29,12 @@ export default async function decorate(block) {
   const config = readBlockConfig(block);
   const pageSize = parseInt(config.pagesize, 10) || 9;
 
+  // Workshop-simplified stand-in for the real `order_approval_threshold` business-config
+  // value from Extend Business Logic. This authored field and that config are not wired
+  // together yet — see the API Orchestration page's optional stretch step for the fix.
+  console.log('config', config);
+  const approvalThreshold = parseFloat(config['approval-threshold']) || 500;
+
   const fragment = document.createRange().createContextualFragment(`
     <div class="search__wrapper">
       <div class="search__result-info"></div>
@@ -128,6 +134,27 @@ export default async function decorate(block) {
     return button;
   };
 
+  const getAddToCompareButton = (product) => {
+    const productName = product.name || product.sku;
+    const button = document.createElement('div');
+    UI.render(Button, {
+      'aria-label': `Add ${productName} to compare`,
+      children: 'Add to compare',
+      variant: 'secondary',
+      onClick: () => {
+        const payload = {
+          sku: product.sku,
+          name: product.name,
+          image: product.images?.[0]?.url,
+        };
+        events.emit('compare/products', payload);
+        // eslint-disable-next-line no-console
+        console.log('compare/products', payload);
+      },
+    })(button);
+    return button;
+  };
+
   await Promise.all([
     // Sort By
     provider.render(SortBy, {})($productSort),
@@ -187,7 +214,17 @@ export default async function decorate(block) {
           })($wishlistToggle);
           actionsWrapper.appendChild(addToCartBtn);
           actionsWrapper.appendChild($wishlistToggle);
+          // Add to Compare Button
+          const addToCompareBtn = getAddToCompareButton(ctx.product);
+          addToCompareBtn.className = 'product-discovery-product-actions__add-to-compare';
+          actionsWrapper.appendChild(addToCompareBtn);
           ctx.replaceWith(actionsWrapper);
+        },
+        Header: (ctx) => {
+          const el = document.createElement('div');
+          el.className = 'approval-disclaimer';
+          el.textContent = `Orders over $${approvalThreshold} are reviewed and manually approved before they ship.`;
+          ctx.appendChild(el);
         },
       },
     })($productList),

@@ -12,6 +12,7 @@ Block configuration is read via `readBlockConfig(block)`.
 |----------|--------|
 | `urlpath` | When set, the block runs in **category page** mode: it filters by `categoryPath` and shows all products in that category. When absent, the block runs in **search page** mode and uses the `q` URL parameter as the search phrase. The value is also stored on the block as `data-urlpath` for use by other blocks (e.g. enrichment). |
 | `pageSize` | Number of products per page. Defaults to `9` if not set or invalid. |
+| `Approval Threshold` | Dollar amount shown in the manual-approval disclaimer above the product grid (e.g. "Orders over $500 are reviewed..."). Defaults to `500` if not set or invalid. This is a workshop-simplified stand-in for the real `order_approval_threshold` business-config value from Extend Business Logic; the two are not wired together yet. |
 
 ## Integration
 
@@ -49,6 +50,10 @@ This block does not use localStorage.
 - **Search page** (no `urlpath`): Initial search uses `q` as the phrase, visibility filter, and sort/filter from the URL.
 
 A visibility filter `{ attribute: 'visibility', in: ['Search', 'Catalog, Search'] }` is always added to the request; it is not persisted in the URL but is included when syncing the URL after each result.
+
+### Approval Disclaimer
+
+A `.approval-disclaimer` notice is rendered above the product grid via the `Header` slot of the `SearchResults` container. It is a general policy notice (not tied to the shopper's cart) and is always shown once the block's config is read, regardless of search results.
 
 ### User Interaction Flows
 

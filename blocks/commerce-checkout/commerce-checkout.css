@@ -108,6 +108,17 @@
     display: none;
 }
 
+.commerce-checkout .approval-disclaimer {
+    margin: 0 0 var(--spacing-small);
+    padding: var(--spacing-xsmall) var(--spacing-small);
+    border: 1px solid var(--color-informational-500);
+    border-radius: 4px;
+    background-color: var(--color-informational-200);
+    color: var(--color-neutral-900);
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
 .checkout__loader {
     align-items: center;
     background: var(--color-neutral-50);

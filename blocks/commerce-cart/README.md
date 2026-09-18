@@ -20,6 +20,7 @@ The Commerce Cart block renders a comprehensive shopping cart interface with pro
 | `checkout-url` | string | `''` | URL for checkout button | No | Sets destination for checkout action |
 | `enable-updating-product` | string | `'false'` | Enables product editing via mini-PDP modal | No | Shows/hides edit buttons for configurable products |
 | `undo-remove-item` | string | `'false'` | Enables undo functionality when removing items | No | Shows/hides undo option after item removal |
+| `approval-threshold` | string | `''` (falls back to `500`) | Dollar amount shown in the manual-approval disclaimer above the cart list | No | Changes the amount displayed in the approval disclaimer message |
 
 <!-- ### URL Parameters
 

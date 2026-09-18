@@ -33,7 +33,12 @@ import '../../scripts/initializers/cart.js';
 import '../../scripts/initializers/wishlist.js';
 
 import { readBlockConfig } from '../../scripts/aem.js';
-import { fetchPlaceholders, rootLink, getProductLink } from '../../scripts/commerce.js';
+import {
+  fetchOrderApprovalThreshold,
+  fetchPlaceholders,
+  rootLink,
+  getProductLink,
+} from '../../scripts/commerce.js';
 
 export default async function decorate(block) {
   // Configuration
@@ -48,7 +53,15 @@ export default async function decorate(block) {
     'checkout-url': checkoutURL = '',
     'enable-updating-product': enableUpdatingProduct = 'false',
     'undo-remove-item': undo = 'false',
+    'approval-threshold': approvalThreshold = '',
   } = readBlockConfig(block);
+
+  // Prefer the mesh-provided `order_approval_threshold` business-config value
+  // (Extend Business Logic) over the authored field, falling back to the
+  // authored field and then a hardcoded default so the disclaimer never
+  // disappears if the mesh query fails or returns null.
+  const meshApprovalThreshold = await fetchOrderApprovalThreshold();
+  const approvalThresholdAmount = meshApprovalThreshold ?? (parseFloat(approvalThreshold) || 500);
 
   const placeholders = await fetchPlaceholders();
 
@@ -183,6 +196,13 @@ export default async function decorate(block) {
       enableRemoveItem: enableRemoveItem === 'true',
       undo: undo === 'true',
       slots: {
+        Heading: (ctx) => {
+          const el = document.createElement('div');
+          el.className = 'approval-disclaimer';
+          el.textContent = `Orders over $${approvalThresholdAmount} are reviewed and manually approved before they ship.`;
+          ctx.appendChild(el);
+        },
+
         Thumbnail: (ctx) => {
           const { item, defaultImageProps } = ctx;
           const anchorWrapper = document.createElement('a');

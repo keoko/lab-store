@@ -201,7 +201,7 @@ ${d}`, i = `fragment ORDER_SUMMARY_FRAGMENT on OrderTotal {
     }
     label
   }
-}`, o = (`fragment RETURNS_FRAGMENT on Returns {
+}`, o = `fragment RETURNS_FRAGMENT on Returns {
   __typename
   items {
     number
@@ -240,7 +240,7 @@ ${d}`, i = `fragment ORDER_SUMMARY_FRAGMENT on OrderTotal {
       }
     }
   }
-}`), R = `fragment APPLIED_GIFT_CARDS_FRAGMENT on ApplyGiftCardToOrder {
+}`, R = `fragment APPLIED_GIFT_CARDS_FRAGMENT on ApplyGiftCardToOrder {
   __typename
   code
   applied_balance {
@@ -357,7 +357,7 @@ ${a}
 ${E}
 ${i}
 ${t}
-${_}`, u = `fragment CUSTOMER_ORDER_FRAGMENT on CustomerOrder {
+${_}`, u = (`fragment CUSTOMER_ORDER_FRAGMENT on CustomerOrder {
   printed_card_included
   gift_receipt_included
   gift_wrapping {
@@ -439,6 +439,7 @@ ${_}`, u = `fragment CUSTOMER_ORDER_FRAGMENT on CustomerOrder {
   total {
     ...ORDER_SUMMARY_FRAGMENT
   }
+  trackingId
 }
 ${e}
 ${R}
@@ -450,7 +451,7 @@ ${a}
 ${E}
 ${i}
 ${t}
-${_}`, m = `fragment PLACE_ORDER_FRAGMENT on PlaceOrderOutput {
+${_}`), m = `fragment PLACE_ORDER_FRAGMENT on PlaceOrderOutput {
   errors {
     code
     message

@@ -317,6 +317,11 @@
         "component": "boolean",
         "name": "undo-remove-item",
         "label": "Undo Remove Item"
+      },
+      {
+        "component": "text",
+        "name": "approval-threshold",
+        "label": "Approval Threshold"
       }
     ]
   },
@@ -473,6 +478,12 @@
         "label": "Page Size",
         "value": 9,
         "description": "Number of products per page (default: 9)"
+      },
+      {
+        "component": "text",
+        "name": "approval-threshold",
+        "label": "Approval Threshold",
+        "description": "Dollar amount shown in the manual-approval disclaimer above the product grid (default: 500)"
       }
     ]
   },

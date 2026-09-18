@@ -7,3 +7,7 @@
 .commerce-shipping-status .order-shipping-status-card {
     margin-bottom: var(--spacing-small);
 }
+
+.commerce-shipping-status .shipping-status-tracking-id {
+    margin: 0 0 var(--spacing-small);
+}

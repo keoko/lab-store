@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Commerce Shipping Status block renders shipping status information using the @dropins/storefront-order ShippingStatus container. It provides shipping tracking, product images, and navigation with UPS-specific tracking integration.
+The Commerce Shipping Status block renders shipping status information using the @dropins/storefront-order ShippingStatus container. It provides shipping tracking, product images, navigation with UPS-specific tracking integration, and the order's mesh-stitched tracking ID.
 
 ## Integration
 
@@ -18,15 +18,15 @@ No URL parameters directly affect this block's behavior. -->
 
 No localStorage keys are used by this block. -->
 
-<!-- ### Events
+### Events
 
 #### Event Listeners
 
-No direct event listeners are implemented in this block.
+- `order/data`: Captures the current order's `trackingId` (sourced from the mesh-stitched `CustomerOrder.trackingId` field) and renders it directly on the block, independent of the ShippingStatus container's shipment-scoped slots.
 
 #### Event Emitters
 
-No events are emitted by this block. -->
+No events are emitted by this block.
 
 ## Behavior Patterns
 
@@ -42,6 +42,7 @@ No events are emitted by this block. -->
 3. **Image Rendering**: Renders product images using AEM assets for various shipping status cards
 4. **Tracking Navigation**: Users can click tracking links to view shipping status (UPS-specific handling)
 5. **Product Navigation**: Users can navigate to product detail pages
+6. **Tracking ID Display**: Prepends "Tracking ID: `<value>`" to the block when the order has a mesh-stitched `trackingId`, regardless of shipment status; renders nothing for orders without one
 
 ### Error Handling
 

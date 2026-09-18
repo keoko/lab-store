@@ -65,7 +65,7 @@ import {
   TERMS_AND_CONDITIONS_FORM_NAME,
 } from './constants.js';
 
-import { rootLink } from '../../scripts/commerce.js';
+import { fetchOrderApprovalThreshold, rootLink } from '../../scripts/commerce.js';
 
 // Initializers
 import '../../scripts/initializers/account.js';
@@ -136,6 +136,16 @@ export default async function decorate(block) {
   const $termsAndConditions = getElement(selectors.checkout.termsAndConditions);
 
   block.appendChild(checkoutFragment);
+
+  // Mesh-provided `order_approval_threshold` business-config value (Extend Business
+  // Logic), falling back to a hardcoded default so the disclaimer never disappears
+  // or throws if the mesh query fails or returns null.
+  const meshApprovalThreshold = await fetchOrderApprovalThreshold();
+  const approvalThresholdAmount = meshApprovalThreshold ?? 500;
+  const approvalDisclaimer = document.createElement('p');
+  approvalDisclaimer.className = 'approval-disclaimer';
+  approvalDisclaimer.textContent = `Orders over $${approvalThresholdAmount} are reviewed and manually approved before they ship.`;
+  $placeOrder.before(approvalDisclaimer);
 
   const handleValidation = () => validateForms([
     { name: LOGIN_FORM_NAME },
