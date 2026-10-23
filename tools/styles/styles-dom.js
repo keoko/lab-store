@@ -178,16 +178,3 @@ export function applyTableStyle(html, styleClass, known) {
   (paragraph || cell).textContent = value;
   return serialize(table);
 }
-
-/**
- * Value of the `design-tokens` row in the page's metadata block, i.e. the
- * sheet the site's scripts/design-tokens.js loads.
- * @param {string} html live document html
- * @returns {string} empty when the page declares none
- */
-export function getDesignTokensPath(html) {
-  const meta = parseHtml(html).querySelector('div.metadata');
-  const row = [...(meta?.children || [])]
-    .find((r) => r.children[0]?.textContent.trim().toLowerCase() === 'design-tokens');
-  return row?.children[1]?.textContent.trim() || '';
-}

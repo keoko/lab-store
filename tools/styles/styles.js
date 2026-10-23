@@ -23,7 +23,7 @@ import {
   applyBlockStyle,
   getStyleTable,
   applyTableStyle,
-  getDesignTokensPath,
+  parseHtml,
 } from './styles-dom.js';
 
 const HOST_TIMEOUT_MS = 3000;
@@ -39,6 +39,7 @@ const state = {
   blockIndex: null,
   editable: true,
   sheetPath: undefined,
+  context: null,
   styles: [],
   target: null,
   busy: false,
@@ -165,8 +166,9 @@ function render() {
   if (!state.sheetPath) {
     const hint = document.createElement('p');
     hint.className = 'style-hint';
-    hint.textContent = 'This page has no design-tokens metadata, so there are no styles to pick. '
-      + 'Add a design-tokens row to the page metadata, or open this panel with ?sheet=/path/to/sheet.';
+    hint.textContent = 'No design-tokens metadata found on the previewed page, so there are no styles '
+      + 'to pick. Add a design-tokens row to the page metadata and preview the page, or register '
+      + 'this panel with ?sheet=/path/to/sheet.';
     children.push(hint);
   } else {
     children.push(list);
@@ -204,8 +206,32 @@ async function targetFromSelection() {
   }
 }
 
+const SHEET_RETRY_MS = 5000;
+let sheetCheckedAt = 0;
+
+/**
+ * The sheet the site's scripts/design-tokens.js loads: a `?sheet=` override,
+ * else the `design-tokens` meta of the page. The host strips the metadata
+ * block from the live document, so the previewed page is fetched instead.
+ * @returns {Promise<string>} empty when none is found
+ */
+async function resolveSheetPath() {
+  const override = new URLSearchParams(window.location.search).get('sheet');
+  if (override) return override;
+  if (state.sheetPath || Date.now() - sheetCheckedAt < SHEET_RETRY_MS) return state.sheetPath || '';
+  sheetCheckedAt = Date.now();
+  try {
+    const resp = await fetch(new URL(state.context?.path || '/', window.location.origin));
+    if (!resp.ok) return '';
+    const meta = parseHtml(await resp.text()).querySelector('meta[name="design-tokens"]');
+    return meta?.content || '';
+  } catch {
+    return '';
+  }
+}
+
 async function onLive({ html, selection, editable }) {
-  const path = new URLSearchParams(window.location.search).get('sheet') || getDesignTokensPath(html);
+  const path = await resolveSheetPath();
   state.html = html;
   state.blockIndex = selection.blockIndex;
   if (editable !== undefined) state.editable = editable;
@@ -270,15 +296,15 @@ async function apply(style) {
 }
 
 async function init() {
-  const sdk = await Promise.race([
-    DA_SDK,
-    new Promise((resolve) => { setTimeout(resolve, HOST_TIMEOUT_MS); }),
-  ]);
-  if (!sdk) {
+  // The host answers once the iframe has loaded; if nothing arrives, say why
+  // but keep waiting so a slow handshake still recovers.
+  const hint = setTimeout(() => {
     state.message = 'Open this panel from the Experience Workspace canvas.';
     render();
-    return;
-  }
+  }, HOST_TIMEOUT_MS);
+  const sdk = await DA_SDK;
+  clearTimeout(hint);
+  state.message = '';
   if (!sdk.capabilities?.liveDocument) {
     state.message = 'This Experience Workspace version does not support live document access.';
     state.error = true;
@@ -286,6 +312,7 @@ async function init() {
     return;
   }
   state.actions = sdk.actions;
+  state.context = sdk.context;
   render();
   sdk.actions.subscribeLiveDocument(onLive);
   setInterval(pollSelection, SELECTION_POLL_MS);
