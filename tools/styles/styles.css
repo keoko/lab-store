@@ -1,0 +1,131 @@
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #f8f8f8;
+  color: #222;
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+.style-picker {
+  padding: 16px;
+}
+
+.style-picker h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.style-picker .style-status {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  background: #fff;
+  color: #505050;
+  text-align: center;
+}
+
+.style-picker .style-status[data-error='true'] {
+  border-color: #d31510;
+  color: #d31510;
+}
+
+.style-picker .style-hint {
+  color: #505050;
+}
+
+.style-picker .style-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.style-picker .style-name {
+  display: block;
+  margin-bottom: 4px;
+  color: #505050;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.style-picker .style-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.style-picker .style-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.style-picker .style-card:focus-visible {
+  outline: 2px solid #3b63fb;
+  outline-offset: 2px;
+}
+
+.style-picker .style-card:not(:disabled):hover {
+  border-color: #b5b5b5;
+}
+
+.style-picker .style-card[aria-pressed='true'] {
+  border-color: #3b63fb;
+}
+
+.style-picker .style-preview {
+  --sp-bg: #f5f5f5;
+  --sp-text: #292929;
+  --sp-primary: #454545;
+  --sp-border: transparent;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  min-height: 96px;
+  border: 1px solid var(--sp-border);
+  border-radius: 8px;
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  text-align: left;
+}
+
+.style-picker .style-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px;
+}
+
+.style-picker .style-text {
+  font-size: 11px;
+}
+
+.style-picker .style-heading {
+  color: var(--sp-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.style-picker .style-button {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--sp-primary);
+  color: var(--sp-bg);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.style-picker .style-art {
+  background: linear-gradient(135deg, #8b8b92, #54545a);
+}
