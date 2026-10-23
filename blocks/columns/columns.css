@@ -1,33 +1,55 @@
-.columns > div {
-  display: flex;
-  flex-direction: column;
+.columns>div {
+    display: flex;
+    flex-direction: column;
 }
 
 .columns img {
-  width: 100%;
+    width: 100%;
 }
 
-.columns > div > div {
-  order: 1;
+.columns>div>div {
+    order: 1;
 }
 
-.columns > div > .columns-img-col {
-  order: 0;
+/*
+ * Design-token consumption (see scripts/design-tokens.js).
+ * The loader injects `.<style-name> { --color-primary: …; --background-color: … }`
+ * and stamps matching `data-*` attributes on the block. The attribute selectors
+ * self-scope these rules to columns blocks that actually opted into a token, so
+ * plain columns blocks are untouched (no site-wide override of --color-primary).
+ */
+.columns[data-background-color] {
+    background-color: var(--background-color);
 }
 
-.columns > div > .columns-img-col img {
-  display: block;
+/*
+ * `strong` alone marks plain bold emphasis (e.g. a closing callout
+ * sentence) and stays the default text color. `em > strong` marks an
+ * accent label (e.g. "*Kenmerken*:" in the flair-rose intro copy) and
+ * picks up the brand color.
+ */
+.columns[data-color-primary] :is(h1, h2, h3),
+.columns[data-color-primary] em strong {
+    color: var(--color-primary);
+}
+
+.columns>div>.columns-img-col {
+    order: 0;
+}
+
+.columns>div>.columns-img-col img {
+    display: block;
 }
 
 @media (min-width: 900px) {
-  .columns > div {
-    align-items: center;
-    flex-direction: unset;
-    gap: 24px;
-  }
+    .columns>div {
+        align-items: center;
+        flex-direction: unset;
+        gap: 24px;
+    }
 
-  .columns > div > div {
-    flex: 1;
-    order: unset;
-  }
+    .columns>div>div {
+        flex: 1;
+        order: unset;
+    }
 }

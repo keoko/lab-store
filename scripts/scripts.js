@@ -10,6 +10,7 @@ import {
   loadCSS,
   buildBlock,
 } from './aem.js';
+import { loadDesignTokens, applyDesignTokenDataAttributes } from './design-tokens.js';
 import {
   loadCommerceEager,
   loadCommerceLazy,
@@ -202,6 +203,14 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  // Stamp design-token data-* attributes (e.g. data-background-color) onto
+  // sections before applySectionBackgrounds, so a token-styled section's
+  // background flows through the existing section-background machinery
+  // (inline paint, full-width, etc.).
+  applyDesignTokenDataAttributes(main);
+  // Blocks only pick up their `block` class in decorateBlocks() above, so
+  // block-level design tokens (e.g. `.block.<style>`) need a second pass here.
+  applyDesignTokenDataAttributes(main);
 }
 
 /**
@@ -217,6 +226,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     try {
+      await loadDesignTokens();
       await initializeCommerce();
       decorateMain(main);
       applyTemplates(doc);
