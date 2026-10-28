@@ -20,7 +20,6 @@ The Commerce Cart block renders a comprehensive shopping cart interface with pro
 | `checkout-url` | string | `''` | URL for checkout button | No | Sets destination for checkout action |
 | `enable-updating-product` | string | `'false'` | Enables product editing via mini-PDP modal | No | Shows/hides edit buttons for configurable products |
 | `undo-remove-item` | string | `'false'` | Enables undo functionality when removing items | No | Shows/hides undo option after item removal |
-| `approval-threshold` | string | `''` (falls back to `500`) | Dollar amount shown in the manual-approval disclaimer above the cart list | No | Changes the amount displayed in the approval disclaimer message |
 
 <!-- ### URL Parameters
 
@@ -49,6 +48,7 @@ No localStorage keys are used by this block. -->
 - **Populated Cart**: When cart has items, shows full cart interface with product list and order summary
 - **Configurable Products**: When configurable products are present and editing is enabled, shows edit buttons
 - **Gift Options**: Shows gift options section when cart is not empty
+- **Promotions**: Cart items show applicable discount/promotion rule labels beneath their details
 
 ### User Interaction Flows
 

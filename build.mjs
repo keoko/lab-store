@@ -10,13 +10,7 @@ overrideGQLOperations([
   {
     npm: '@dropins/storefront-order',
     skipFragments: ['DOWNLOADABLE_ORDER_ITEMS_FRAGMENT'],
-    operations: [
-      `
-      fragment CUSTOMER_ORDER_FRAGMENT on CustomerOrder {
-        trackingId
-      }
-      `,
-    ],
+    operations: [],
   },
   // {
   //   npm: '@dropins/storefront-checkout',

@@ -20,13 +20,6 @@ import {
   rootLink,
 } from '../commerce.js';
 
-// Surface the mesh-stitched `trackingId` field on the OrderDataModel used by containers/slots.
-const ORDER_MODELS_CONFIG = {
-  OrderDataModel: {
-    transformer: (orderData) => ({ trackingId: orderData?.trackingId ?? null }),
-  },
-};
-
 await initializeDropin(async () => {
   // Set Fetch GraphQL (Core)
   setEndpoint(CORE_FETCH_GRAPHQL);
@@ -78,7 +71,6 @@ await initializeDropin(async () => {
     langDefinitions,
     orderRef,
     returnRef,
-    models: ORDER_MODELS_CONFIG,
   });
 })();
 
@@ -126,7 +118,6 @@ async function handleUserOrdersRedirects(
       langDefinitions,
       orderRef,
       returnRef,
-      models: ORDER_MODELS_CONFIG,
     });
   }
 }

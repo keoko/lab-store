@@ -10,7 +10,6 @@ import {
   loadCSS,
   buildBlock,
 } from './aem.js';
-import { loadDesignTokens, applyDesignTokenDataAttributes } from './design-tokens.js';
 import {
   loadCommerceEager,
   loadCommerceLazy,
@@ -22,17 +21,6 @@ import {
   IS_UE,
   IS_DA,
 } from './commerce.js';
-import {
-  runExperimentation,
-  runExperimentationLazy,
-} from './experiment-loader.js';
-
-const experimentationConfig = {
-  prodHost: 'main--lab-store--keoko.aem.live', // add your prodHost here, otherwise we will show mock data
-  audiences: {
-    // define your custom audiences here as needed
-  },
-};
 
 /*
  * Trusted Types default policy.
@@ -203,14 +191,6 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
-  // Stamp design-token data-* attributes (e.g. data-background-color) onto
-  // sections before applySectionBackgrounds, so a token-styled section's
-  // background flows through the existing section-background machinery
-  // (inline paint, full-width, etc.).
-  applyDesignTokenDataAttributes(main);
-  // Blocks only pick up their `block` class in decorateBlocks() above, so
-  // block-level design tokens (e.g. `.block.<style>`) need a second pass here.
-  applyDesignTokenDataAttributes(main);
 }
 
 /**
@@ -221,12 +201,9 @@ async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
 
-  await runExperimentation(doc, experimentationConfig);
-
   const main = doc.querySelector('main');
   if (main) {
     try {
-      await loadDesignTokens();
       await initializeCommerce();
       decorateMain(main);
       applyTemplates(doc);
@@ -254,9 +231,7 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  await runExperimentationLazy(doc, experimentationConfig);
-
-  loadHeader(doc.querySelector('header'));
+  loadHeader(doc.querySelector('body > header'));
 
   const main = doc.querySelector('main');
   await loadSections(main);
@@ -265,14 +240,12 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadFooter(doc.querySelector('footer'));
+  loadFooter(doc.querySelector('body > footer'));
 
-  loadCommerceLazy();
+  await loadCommerceLazy();
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
-
-	import('../tools/sidekick/aem-genai-variations.js');
 }
 
 /**
@@ -280,7 +253,7 @@ async function loadLazy(doc) {
  * without impacting the user experience.
  */
 function loadDelayed() {
-  window.setTimeout(() => import('./delayed.js'), 3000);
+  import('./consent-check.js');
   // load anything that can be postponed to the latest here
 }
 

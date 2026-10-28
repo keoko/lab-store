@@ -14,6 +14,17 @@ import {
 } from './aem.js';
 import initializeDropins from './initializers/index.js';
 
+let consentGranted = false;
+
+/** Returns the latest upstream consent notification for this document. */
+export function isConsentGranted() {
+  return consentGranted;
+}
+
+window.addEventListener('consent.update', ({ detail }) => {
+  consentGranted = detail?.consented === true;
+});
+
 /**
  * Sanitizes the given string by:
  * - convert to lower case
@@ -313,7 +324,6 @@ export async function loadCommerceLazy() {
   // Initialize Adobe Client Data Layer
   await import('./acdl/adobe-client-data-layer.min.js');
 
-  // Track history
   trackHistory();
 }
 
@@ -333,32 +343,6 @@ export async function initializeCommerce() {
   CS_FETCH_GRAPHQL.setFetchGraphQlHeaders((prev) => ({ ...prev, ...getHeaders('cs') }));
 
   return initializeDropins();
-}
-
-/**
- * Fetches the order approval threshold (Extend Business Logic `order_approval_threshold`
- * business-config value) from the mesh.
- * @returns {Promise<number|null>} The threshold amount, or null if the mesh query
- * fails or returns no value.
- */
-export async function fetchOrderApprovalThreshold() {
-  try {
-    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(`
-      query ORDER_APPROVAL_THRESHOLD {
-        orderApprovalThreshold
-      }
-    `);
-
-    if (errors?.length) {
-      console.warn('Failed to fetch orderApprovalThreshold from mesh:', errors);
-      return null;
-    }
-
-    return data?.orderApprovalThreshold ?? null;
-  } catch (error) {
-    console.warn('Failed to fetch orderApprovalThreshold from mesh:', error);
-    return null;
-  }
 }
 
 /**
@@ -691,6 +675,32 @@ export function isProductTemplate() {
   });
 }
 
+/**
+ * Renders promotion/discount rule labels for a cart item, keeping them in sync
+ * as the item's data changes. Used by the cart, mini-cart, and checkout
+ * order-summary line items, which all share the same dropin cart-item context.
+ * @param {Object} ctx - The dropin cart-item Footer slot context
+ * @returns {HTMLElement} The promotions wrapper element
+ */
+export function renderCartItemPromotions(ctx) {
+  const promotionsWrapper = document.createElement('div');
+  promotionsWrapper.className = 'cart-item-promotions';
+
+  ctx.onChange((next) => {
+    promotionsWrapper.innerHTML = '';
+    next.item?.discount?.label?.forEach((label) => {
+      const promoDiv = document.createElement('div');
+      promoDiv.className = 'cart-item-promotion-label';
+      promoDiv.textContent = label;
+      promotionsWrapper.appendChild(promoDiv);
+    });
+  });
+
+  ctx.appendChild(promotionsWrapper);
+
+  return promotionsWrapper;
+}
+
 export function getProductLink(urlKey, sku) {
   if (!urlKey) {
     console.warn('getProductLink: urlKey is missing or empty', { urlKey, sku });
@@ -746,15 +756,17 @@ export function getStoreIdentifier() {
  * Tracks user browsing and purchase history for recommendations.
  * Stores product view history and purchase history in localStorage.
  */
+let historyTrackingInitialized = false;
+
 function trackHistory() {
-  if (!getConsent('commerce-recommendations')) {
+  if (historyTrackingInitialized) {
     return;
   }
-  // Store product view history in session storage
   const storeIdentifier = getStoreIdentifier();
   if (storeIdentifier) {
+    historyTrackingInitialized = true;
     window.adobeDataLayer.push((dl) => {
-      dl.addEventListener('adobeDataLayer:change', (event) => {
+      const recordProductView = (event) => {
         // Speculation Rules prerendering pushes productContext once immediately and
         // again on activation. Ignore the prerender-only push so hovering a link
         // doesn't record a view that never actually happened.
@@ -766,8 +778,14 @@ function trackHistory() {
         viewHistory = viewHistory.filter((item) => item.sku !== event.productContext.sku);
         viewHistory.push({ date: new Date().toISOString(), sku: event.productContext.sku });
         window.localStorage.setItem(key, JSON.stringify(viewHistory.slice(-20)));
-      }, { path: 'productContext' });
+      };
+      dl.addEventListener('adobeDataLayer:change', recordProductView, {
+        path: 'productContext',
+      });
       dl.addEventListener('place-order', () => {
+        if (document.prerendering) {
+          return;
+        }
         const shoppingCartContext = dl.getState('shoppingCartContext');
         if (!shoppingCartContext) {
           return;
@@ -852,16 +870,6 @@ export async function loadErrorPage(code = 404) {
  */
 export function checkIsAuthenticated() {
   return !!getCookie('auth_dropin_user_token') ?? false;
-}
-
-/**
- * Check if consent was given for a specific topic.
- * @param {*} topic Topic identifier
- * @returns {boolean} True if consent was given
- */
-export function getConsent(_topic) {
-  console.warn('getConsent not implemented');
-  return true;
 }
 
 /**
