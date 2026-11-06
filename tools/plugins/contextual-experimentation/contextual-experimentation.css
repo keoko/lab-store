@@ -1,0 +1,47 @@
+.contextual-experimentation {
+  margin: 0;
+  color: #242424;
+  background: #fff;
+  font: 14px/1.5 system-ui, sans-serif;
+}
+
+.contextual-experimentation form,
+.contextual-experimentation #status {
+  margin: 16px;
+}
+
+.contextual-experimentation label {
+  display: block;
+  font-weight: 600;
+}
+
+.contextual-experimentation input {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+}
+
+.contextual-experimentation button {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 16px;
+  background: #3b63fb;
+  color: white;
+  cursor: pointer;
+}
+
+.contextual-experimentation button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.contextual-experimentation iframe {
+  width: 100%;
+  height: 100dvh;
+  border: 0;
+}
+
+.contextual-experimentation [hidden] {
+  display: none;
+}

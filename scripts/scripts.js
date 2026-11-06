@@ -293,3 +293,9 @@ loadPage();
   // eslint-disable-next-line import/no-unresolved
   import('https://da.live/scripts/dapreview.js').then(({ default: daPreview }) => daPreview(loadPage));
 }());
+
+(async function loadQuickEdit() {
+  if (new URLSearchParams(window.location.search).get('quick-edit') !== 'on') return;
+  const { default: initQuickEdit } = await import('../tools/quick-edit/quick-edit.js');
+  await initQuickEdit(loadPage);
+}());
